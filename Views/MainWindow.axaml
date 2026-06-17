@@ -53,6 +53,17 @@
                                        Minimum="0" Maximum="100000000" Increment="100"
                                        FormatString="0" Width="140"/>
                     </StackPanel>
+
+                    <!-- Filter the object list -->
+                    <Grid ColumnDefinitions="Auto,*" Margin="0,8,0,0">
+                        <ComboBox Grid.Column="0" SelectedIndex="{Binding FilterModeIndex}"
+                                  Width="150" Margin="0,0,6,0">
+                            <ComboBoxItem>Contains</ComboBoxItem>
+                            <ComboBoxItem>Does not contain</ComboBoxItem>
+                        </ComboBox>
+                        <TextBox Grid.Column="1" Text="{Binding FilterText}"
+                                 Watermark="filter pattern…"/>
+                    </Grid>
                 </StackPanel>
 
                 <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
@@ -79,15 +90,24 @@
                           ResizeDirection="Columns" HorizontalAlignment="Center"/>
 
             <!-- Generated SQL output -->
-            <Border Grid.Column="2"
-                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
-                    BorderThickness="1" CornerRadius="4">
-                <sc:SyntaxHighlightingTextBox x:Name="SqlEditor"
-                                              Text="{Binding GeneratedSql}"
-                                              Language="MsSql"
-                                              ShowLineNumbers="True"
-                                              FontFamily="Cascadia Code,Consolas,Menlo,monospace"/>
-            </Border>
+            <DockPanel Grid.Column="2">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal"
+                            HorizontalAlignment="Right" Margin="0,0,0,6">
+                    <Button Content="Copy" Click="OnCopyClick" Padding="12,4"/>
+                    <Button Content="Save…" Click="OnSaveClick" Margin="6,0,0,0" Padding="12,4"/>
+                    <Button Content="Clear" Command="{Binding ClearOutputCommand}"
+                            Margin="6,0,0,0" Padding="12,4"/>
+                </StackPanel>
+
+                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                        BorderThickness="1" CornerRadius="4">
+                    <sc:SyntaxHighlightingTextBox x:Name="SqlEditor"
+                                                  Text="{Binding GeneratedSql}"
+                                                  Language="MsSql"
+                                                  ShowLineNumbers="True"
+                                                  FontFamily="Cascadia Code,Consolas,Menlo,monospace"/>
+                </Border>
+            </DockPanel>
         </Grid>
 
         <!-- Status bar -->

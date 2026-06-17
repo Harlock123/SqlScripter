@@ -40,27 +40,54 @@ Server=localhost,1433;Database=MyDb;User Id=sa;Password=Pass123;TrustServerCerti
 Click **Connect** to populate the tree, tick objects (ticking a category selects all
 of its children), then click **Generate Script**.
 
+### Options
+
+- **Script existence checks & DROP if present** — emit an `IF OBJECT_ID(...) ... DROP`
+  guard before each recreated object.
+- **Script INSERT records for tables** — also reproduce table data as `INSERT`
+  statements, with a **Max rows per table** cap (`0` = all rows).
+
+### Filtering the object list
+
+Above the tree, the **filter** box narrows what's shown:
+
+- Choose **Contains** or **Does not contain** and type a (case-insensitive) pattern,
+  matched against each object's `schema.name`.
+- Selections are remembered across filter changes — you can tick some items, change
+  the filter, tick more, and **Generate Script** scripts everything you ticked (even
+  rows currently hidden by the filter). **None** clears the entire selection.
+
 ## Building distributables for every platform
 
-Self-contained, single-file builds for all six targets:
+Each script publishes a self-contained, single-file native executable for all six
+targets. Use the one that matches your OS — neither needs anything beyond a shell and
+the .NET SDK:
+
+**macOS / Linux** (bash, no PowerShell required):
 
 ```bash
-./publish-all.sh           # macOS / Linux
-publish-all.cmd            # Windows
+./publish-all.sh                          # all targets -> ./publish/<rid>/
+./publish-all.sh ./dist "win-x64,linux-x64"   # custom output + subset
 ```
 
-…or one target at a time:
+**Windows** (PowerShell):
+
+```pwsh
+./publish-all.ps1
+./publish-all.ps1 -OutRoot ./dist -Rids win-x64,linux-x64
+```
+
+…or one target at a time without a script:
 
 ```bash
-dotnet publish -c Release -r win-x64    --self-contained true -p:PublishSingleFile=true
-dotnet publish -c Release -r win-arm64  --self-contained true -p:PublishSingleFile=true
-dotnet publish -c Release -r osx-x64    --self-contained true -p:PublishSingleFile=true
-dotnet publish -c Release -r osx-arm64  --self-contained true -p:PublishSingleFile=true
-dotnet publish -c Release -r linux-x64  --self-contained true -p:PublishSingleFile=true
-dotnet publish -c Release -r linux-arm64 --self-contained true -p:PublishSingleFile=true
+dotnet publish SqlScripter.csproj -c Release -r win-arm64 \
+  --self-contained true -p:PublishSingleFile=true \
+  -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
 ```
 
-Artifacts land in `publish/<rid>/`.
+Supported runtime identifiers: `win-x64`, `win-arm64`, `osx-x64`, `osx-arm64`,
+`linux-x64`, `linux-arm64`. Each produces one standalone executable (no .NET install
+required on the target). Artifacts land in `publish/<rid>/`.
 
 ## Notes
 
