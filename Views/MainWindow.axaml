@@ -1,0 +1,101 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SqlScripter.ViewModels"
+        xmlns:sc="using:SyntaxColorizer.Controls"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="700"
+        x:Class="SqlScripter.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Width="1100" Height="700"
+        Title="SqlScripter — MSSQL Drop &amp; Recreate Scripter">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="10">
+
+        <!-- Connection bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,8">
+            <TextBlock Grid.Column="0" Text="Connection string:"
+                       VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <TextBox Grid.Column="1" Text="{Binding ConnectionString}"
+                     Watermark="Server=…;Database=…;User Id=…;Password=…;TrustServerCertificate=True;"
+                     VerticalAlignment="Center"/>
+            <Button Grid.Column="2" Content="Connect"
+                    Command="{Binding ConnectCommand}"
+                    Margin="8,0,0,0" Padding="16,4" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Main content: object tree | generated SQL -->
+        <Grid Grid.Row="1" ColumnDefinitions="320,Auto,*">
+
+            <!-- Object tree -->
+            <DockPanel Grid.Column="0">
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Generate Script" Command="{Binding GenerateScriptCommand}"
+                                Padding="10,4"/>
+                        <Button Content="All" Command="{Binding SelectAllCommand}" Margin="6,0,0,0" Padding="8,4"/>
+                        <Button Content="None" Command="{Binding ClearSelectionCommand}" Margin="6,0,0,0" Padding="8,4"/>
+                    </StackPanel>
+                    <CheckBox Content="Script existence checks &amp; DROP if present"
+                              IsChecked="{Binding ScriptChecksAndDrops}" Margin="0,6,0,0"/>
+                    <CheckBox Content="Script INSERT records for tables"
+                              IsChecked="{Binding ScriptInsertData}" Margin="0,2,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="22,2,0,0"
+                                IsEnabled="{Binding ScriptInsertData}">
+                        <TextBlock Text="Max rows per table (0 = all):"
+                                   VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <NumericUpDown Value="{Binding MaxDataRows}"
+                                       Minimum="0" Maximum="100000000" Increment="100"
+                                       FormatString="0" Width="140"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                        BorderThickness="1" CornerRadius="4">
+                    <TreeView ItemsSource="{Binding RootNodes}">
+                        <TreeView.Styles>
+                            <Style Selector="TreeViewItem">
+                                <Setter Property="IsExpanded" Value="{ReflectionBinding IsExpanded}"/>
+                            </Style>
+                        </TreeView.Styles>
+                        <TreeView.ItemTemplate>
+                            <TreeDataTemplate DataType="vm:DbObjectNode" ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding IsChecked}" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{Binding Title}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </TreeDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Border>
+            </DockPanel>
+
+            <GridSplitter Grid.Column="1" Width="6" Background="Transparent"
+                          ResizeDirection="Columns" HorizontalAlignment="Center"/>
+
+            <!-- Generated SQL output -->
+            <Border Grid.Column="2"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                    BorderThickness="1" CornerRadius="4">
+                <sc:SyntaxHighlightingTextBox x:Name="SqlEditor"
+                                              Text="{Binding GeneratedSql}"
+                                              Language="MsSql"
+                                              ShowLineNumbers="True"
+                                              FontFamily="Cascadia Code,Consolas,Menlo,monospace"/>
+            </Border>
+        </Grid>
+
+        <!-- Status bar -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+            <TextBlock Grid.Column="0" Text="{Binding StatusMessage}"
+                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+            <ProgressBar Grid.Column="1" IsIndeterminate="True" Width="120" Height="6"
+                         IsVisible="{Binding IsBusy}" VerticalAlignment="Center"/>
+        </Grid>
+    </Grid>
+</Window>
