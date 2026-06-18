@@ -17,6 +17,14 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
+  <!-- The headless screenshot harness lives under tools/ with its own project;
+       keep its sources out of this project's default ** globbing. -->
+  <ItemGroup>
+    <Compile Remove="tools/**/*.cs" />
+    <AvaloniaXaml Remove="tools/**/*" />
+    <None Remove="tools/**/*" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.17" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.17" />

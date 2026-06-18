@@ -133,6 +133,18 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Populates the tree directly from a pre-built object list, bypassing a live
+    /// database connection. Intended for tooling such as the headless screenshot
+    /// harness so the UI can be rendered with representative data offline.
+    /// </summary>
+    public void LoadObjects(IReadOnlyList<DbObjectInfo> objects)
+    {
+        _allObjects = objects;
+        _selectedKeys.Clear();
+        RebuildTree();
+    }
+
     // Clears the generated SQL output pane.
     [RelayCommand]
     private void ClearOutput()

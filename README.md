@@ -89,6 +89,28 @@ Supported runtime identifiers: `win-x64`, `win-arm64`, `osx-x64`, `osx-arm64`,
 `linux-x64`, `linux-arm64`. Each produces one standalone executable (no .NET install
 required on the target). Artifacts land in `publish/<rid>/`.
 
+## Screenshots (headless rendering)
+
+The UI can be rendered to PNG **off-screen** — no display server and no SQL Server
+required. A small harness in `tools/Screenshots` reuses the real `App`/`MainWindow`
+on the Avalonia headless platform (with Skia for actual pixels), seeds the tree with
+demo objects and a sample script, and captures a few representative states.
+
+```bash
+./screenshots.sh                 # writes ./screenshots/01-empty.png, 02-connected.png, 03-generated.png
+./screenshots.sh ./shots         # custom output directory
+```
+
+…or invoke the harness directly:
+
+```bash
+dotnet run --project tools/Screenshots -- ./screenshots
+```
+
+Because it reuses the production views, these images reflect exactly what the app
+draws. To capture **real** data instead of the demo seed, run the app normally and
+connect to a live server. (The `screenshots/` directory is git-ignored.)
+
 ## Notes
 
 - Connections use `Microsoft.Data.SqlClient`. SQL authentication and integrated/AAD
