@@ -5,3 +5,4 @@ screenshots/
 .vs/
 .idea/
 *.user
+.docvenv/
