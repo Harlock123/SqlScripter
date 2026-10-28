@@ -96,6 +96,9 @@ required. A small harness in `tools/Screenshots` reuses the real `App`/`MainWind
 on the Avalonia headless platform (with Skia for actual pixels), seeds the tree with
 demo objects and a sample script, and captures a few representative states.
 
+> **Note:** the `tools/Screenshots` project is not in this repository, so
+> `screenshots.sh` and `make-usage-doc.sh` fail until it is added back.
+
 ```bash
 ./screenshots.sh                 # writes ./screenshots/01-empty.png, 02-connected.png, 03-generated.png
 ./screenshots.sh ./shots         # custom output directory
